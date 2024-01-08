@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-    <id>sociallogin-custom-ids</id>
+    <id>sociallogin</id>
     <name>Social Login (Custom IDs)</name>
     <summary>Social login via OAuth or OpenID</summary>
     <description> </description>
@@ -11,10 +11,10 @@
     <namespace>SocialLogin</namespace>
     <category>integration</category>
     <category>social</category>
-    <website>https://github.com/zorn-v/nextcloud-social-login</website>
-    <bugs>https://github.com/zorn-v/nextcloud-social-login/issues</bugs>
-    <repository>https://github.com/zorn-v/nextcloud-social-login</repository>
-    <screenshot>https://raw.githubusercontent.com/zorn-v/nextcloud-social-login/master/appinfo/screenshot.png</screenshot>
+    <website>https://github.com/dotplex/nextcloud-social-login-custom-ids</website>
+    <bugs>https://github.com/dotplex/nextcloud-social-login-custom-ids/issues</bugs>
+    <repository>https://github.com/dotplex/nextcloud-social-login-custom-ids</repository>
+    <screenshot>https://github.com/dotplex/nextcloud-social-login-custom-ids/master/appinfo/screenshot.png</screenshot>
     <dependencies>
         <nextcloud min-version="23" max-version="99" />
     </dependencies>
