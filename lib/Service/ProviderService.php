@@ -574,15 +574,22 @@ class ProviderService
                 }
 
                 foreach ($syncGroups as $group) {
-                    if ($newGroup = $this->groupManager->createGroup($group->gid)) {
+                    $groupNameParts = explode('-', $group->gid);
+                    $sanitizedGid = $group->gid;
+                    if (!empty($groupNameParts)) {
+                        $sanitizedGid = $groupNameParts[0] . '-' . $groupNameParts[1];
+                    }
+                    if ($newGroup = $this->groupManager->createGroup($sanitizedGid)) {
                         $newGroup->addUser($user);
 
-                        if(isset($group->displayName)) {
+                        if(isset($group->displayName) && $group->displayName !== $group->gid) {
                             $newGroup->setDisplayName($group->displayName);
+                        } elseif (count($groupNameParts) >= 3) {
+                            unset($groupNameParts[0], $groupNameParts[1]);
+                            $newGroup->setDisplayName(implode('-', $groupNameParts));
                         }
                     }
                 }
-
             }
 
             $updateAccount = false;
