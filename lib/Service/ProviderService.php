@@ -574,19 +574,31 @@ class ProviderService
                 }
 
                 foreach ($syncGroups as $group) {
-                    $groupNameParts = explode('-', $group->gid);
-                    $sanitizedGid = $group->gid;
-                    if (!empty($groupNameParts)) {
-                        $sanitizedGid = $groupNameParts[0] . '-' . $groupNameParts[1];
-                    }
-                    if ($newGroup = $this->groupManager->createGroup($sanitizedGid)) {
-                        $newGroup->addUser($user);
+                    // StagingKeycloak-Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
+                    // StagingKeycloak-Nextcloud-9f367a130ae143eda1ede9a50e56d896-FK Internet
 
-                        if(isset($group->displayName) && $group->displayName !== $group->gid) {
-                            $newGroup->setDisplayName($group->displayName);
-                        } elseif (count($groupNameParts) >= 3) {
-                            unset($groupNameParts[0], $groupNameParts[1]);
-                            $newGroup->setDisplayName(implode('-', $groupNameParts));
+                    $sanitizedGid = str_replace('StagingKeycloak-', '', $group->gid);
+                    $sanitizedGid = str_replace('ProductionKeycloak-', '', $sanitizedGid);
+                    // Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
+                    // Nextcloud-9f367a130ae143eda1ede9a50e56d896-FK Internet
+
+                    if (str_starts_with($sanitizedGid, 'Nextcloud-')) {
+                        $sanitizedGid = str_replace('Nextcloud-', '', $sanitizedGid);
+                        // 0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
+                        // 9f367a130ae143eda1ede9a50e56d896-FK Internet
+
+                        preg_match('/^[^;-]*/', $sanitizedGid, $matches);
+                        $gid = $matches[0];
+                        // 0010900000cFDzOAAW
+                        // 9f367a130ae143eda1ede9a50e56d896
+
+                        $displayName = preg_replace('/^[^-]*-/', '', $sanitizedGid);
+                        // Bezirk Mittel- und Oberfranken
+                        // FK Internet
+
+                        if ($newGroup = $this->groupManager->createGroup($gid)) {
+                            $newGroup->setDisplayName($displayName);
+                            $newGroup->addUser($user);
                         }
                     }
                 }
