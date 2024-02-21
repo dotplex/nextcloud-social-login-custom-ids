@@ -574,11 +574,11 @@ class ProviderService
                 }
 
                 foreach ($syncGroups as $group) {
+                    // [PROVIDER_NAME]-Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
                     // StagingKeycloak-Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
                     // StagingKeycloak-Nextcloud-9f367a130ae143eda1ede9a50e56d896-FK Internet
 
-                    $sanitizedGid = str_replace('StagingKeycloak-', '', $group->gid);
-                    $sanitizedGid = str_replace('ProductionKeycloak-', '', $sanitizedGid);
+                    $sanitizedGid = str_replace($newGroupPrefix, '', $group->gid);
                     // Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
                     // Nextcloud-9f367a130ae143eda1ede9a50e56d896-FK Internet
 
