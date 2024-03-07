@@ -597,8 +597,12 @@ class ProviderService
                         // FK Internet
 
                         if ($newGroup = $this->groupManager->createGroup($gid)) {
-                            $newGroup->setDisplayName($displayName);
-                            $newGroup->addUser($user);
+                            $if ($newGroup->getDisplayName() !== $displayName) {
+                                $newGroup->setDisplayName($displayName);
+                            }
+                            if (!$this->groupManager->isInGroup($user->getUID(), $newGroup)) {
+                                $newGroup->addUser($user);
+                            }
                         }
                     }
                 }
