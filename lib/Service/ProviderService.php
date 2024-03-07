@@ -596,14 +596,19 @@ class ProviderService
                         // Bezirk Mittel- und Oberfranken
                         // FK Internet
 
-                        if ($newGroup = $this->groupManager->createGroup($gid)) {
-                            if ($newGroup->getDisplayName() !== $displayName) {
-                                $newGroup->setDisplayName($displayName);
-                            }
-                            if (!$this->groupManager->isInGroup($user->getUID(), $newGroup)) {
-                                $newGroup->addUser($user);
-                            }
+                        if ($this->groupManager->groupExists($gid)) {
+                            $socialGroup = $this->groupManager->createGroup($gid);
+                        } else {
+                            $socialGroup = $this->groupManager->get($gid);
+                        } 
+                        
+                        if ($socialGroup->getDisplayName() !== $displayName) {
+                            $socialGroup->setDisplayName($displayName);
                         }
+                        if (!$this->groupManager->isInGroup($user->getUID(), $socialGroup)) {
+                            $socialGroup->addUser($user);
+                        }
+                        
                     }
                 }
             }
