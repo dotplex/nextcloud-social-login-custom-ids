@@ -466,6 +466,43 @@ class ProviderService
         return $this->login($uid, $profile, $provider.'-');
     }
 
+    private function sanitizeSyncGroups(array $syncGroups, $prefix = '')
+    {
+        $sanizedGroups = [];
+
+        foreach ($syncGroups as $group) {
+            // [PROVIDER_NAME]-Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
+            // StagingKeycloak-Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
+            // StagingKeycloak-Nextcloud-9f367a130ae143eda1ede9a50e56d896-FK Internet
+
+            $sanitizedGid = str_replace($prefix, '', $group->gid);
+            // Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
+            // Nextcloud-9f367a130ae143eda1ede9a50e56d896-FK Internet
+
+            if (str_starts_with($sanitizedGid, 'Nextcloud-')) {
+                $sanitizedGid = str_replace('Nextcloud-', '', $sanitizedGid);
+                // 0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
+                // 9f367a130ae143eda1ede9a50e56d896-FK Internet
+
+                preg_match('/^[^;-]*/', $sanitizedGid, $matches);
+                $gid = $matches[0];
+                // 0010900000cFDzOAAW
+                // 9f367a130ae143eda1ede9a50e56d896
+
+                $displayName = preg_replace('/^[^-]*-/', '', $sanitizedGid);
+                // Bezirk Mittel- und Oberfranken
+                // FK Internet
+
+                $sanizedGroups[] = [
+                    'gid' => $gid,
+                    'displayName' => $displayName,
+                ];
+            }
+        }
+
+        return $sanizedGroups;
+    }
+
     private function login($uid, Profile $profile, $newGroupPrefix = '')
     {
         $user = $this->userManager->get($uid);
@@ -565,52 +602,31 @@ class ProviderService
                     }
                 }
 
+                $sanitizedSyncGroups = $this->sanitizeSyncGroups($syncGroups, $newGroupPrefix);
+
                 if (!$this->config->getAppValue($this->appName, 'no_prune_user_groups')) {
                     foreach ($userGroups as $group) {
-                        if (!in_array($group->getGID(), array_column($syncGroups, 'gid'))) {
+                        if (!in_array($group->getGID(), array_column($sanitizedSyncGroups, 'gid'))) {
                             $group->removeUser($user);
                         }
                     }
                 }
 
-                foreach ($syncGroups as $group) {
-                    // [PROVIDER_NAME]-Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
-                    // StagingKeycloak-Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
-                    // StagingKeycloak-Nextcloud-9f367a130ae143eda1ede9a50e56d896-FK Internet
-
-                    $sanitizedGid = str_replace($newGroupPrefix, '', $group->gid);
-                    // Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
-                    // Nextcloud-9f367a130ae143eda1ede9a50e56d896-FK Internet
-
-                    if (str_starts_with($sanitizedGid, 'Nextcloud-')) {
-                        $sanitizedGid = str_replace('Nextcloud-', '', $sanitizedGid);
-                        // 0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
-                        // 9f367a130ae143eda1ede9a50e56d896-FK Internet
-
-                        preg_match('/^[^;-]*/', $sanitizedGid, $matches);
-                        $gid = $matches[0];
-                        // 0010900000cFDzOAAW
-                        // 9f367a130ae143eda1ede9a50e56d896
-
-                        $displayName = preg_replace('/^[^-]*-/', '', $sanitizedGid);
-                        // Bezirk Mittel- und Oberfranken
-                        // FK Internet
-
-                        if ($this->groupManager->groupExists($gid)) {
-                            $socialGroup = $this->groupManager->createGroup($gid);
-                        } else {
-                            $socialGroup = $this->groupManager->get($gid);
-                        } 
-                        
-                        if ($socialGroup->getDisplayName() !== $displayName) {
-                            $socialGroup->setDisplayName($displayName);
-                        }
-                        if (!$this->groupManager->isInGroup($user->getUID(), $socialGroup)) {
-                            $socialGroup->addUser($user);
-                        }
-                        
+                foreach($sanitizedSyncGroups as $sanitizedGroup) {
+                    if ($this->groupManager->groupExists($sanitizedGroup['gid'])) {
+                        $socialGroup = $this->groupManager->get($sanitizedGroup['gid']);
+                    } else {
+                        $socialGroup = $this->groupManager->createGroup($sanitizedGroup['gid']);
+                    }
+                    
+                    if ($socialGroup->getDisplayName() !== $sanitizedGroup['displayName']) {
+                        $socialGroup->setDisplayName($sanitizedGroup['displayName']);
+                    }
+                    if (!$this->groupManager->isInGroup($user->getUID(), $socialGroup)) {
+                        $socialGroup->addUser($user);
                     }
                 }
+
             }
 
             $updateAccount = false;
