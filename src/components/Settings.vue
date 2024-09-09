@@ -70,6 +70,9 @@
     <div class="provider-settings" v-for="(provider, name) in defaultProviders" :key="name">
       <h2 class="provider-title">
         <img :src="imagePath(name.toLowerCase())" /> {{ name[0].toUpperCase() + name.substring(1) }}
+        <div class="provider-remove" @click="provider.appid = null; defaultVisible.splice(defaultVisible.indexOf(name), 1);">
+          x
+        </div>
       </h2>
       <label>
         {{ name === 'apple' ? t(appName, 'Services ID') : t(appName, 'App id') }}<br/>
@@ -295,7 +298,7 @@ export default {
 
 <style scoped>
   input, select, textarea {
-    width: 285px;
+    width: 100%;
   }
   input[type="checkbox"] {
     width: 20px;
@@ -310,6 +313,7 @@ export default {
     vertical-align: top;
     margin-right: 15px;
     margin-bottom: 20px;
+    min-width: 285px;
   }
   .provider-settings .provider-remove {
     float: right;
