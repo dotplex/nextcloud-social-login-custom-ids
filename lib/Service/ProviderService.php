@@ -26,6 +26,7 @@ use OCP\IURLGenerator;
 use OCP\IUserSession;
 use OCP\IUserManager;
 use OCP\Mail\IMailer;
+use Psr\Log\LoggerInterface;
 
 class ProviderService
 {
@@ -176,6 +177,8 @@ class ProviderService
     private $accountManager;
     /** @var IProvider */
     private $tokenProvider;
+    /** @var LoggerInterface; */
+    private $logger;
 
 
     public function __construct(
@@ -193,7 +196,8 @@ class ProviderService
         IMailer $mailer,
         ConnectedLoginMapper $socialConnect,
         IAccountManager $accountManager,
-        IProvider $tokenProvider
+        IProvider $tokenProvider,
+        LoggerInterface $logger
     ) {
         $this->appName = $appName;
         $this->request = $request;
@@ -210,6 +214,7 @@ class ProviderService
         $this->socialConnect = $socialConnect;
         $this->accountManager = $accountManager;
         $this->tokenProvider = $tokenProvider;
+        $this->logger = $logger;
     }
 
     public function getLoginClass($name, $provider = [], $type = null)
@@ -468,10 +473,10 @@ class ProviderService
 
     private function sanitizeSyncGroups(array $syncGroups, $prefix = '')
     {
-        $sanizedGroups = [];
+        $sanitizedGroups = [];
 
         foreach ($syncGroups as $group) {
-            // [PROVIDER_NAME]-Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
+            // [$prefix]-Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
             // StagingKeycloak-Nextcloud-0010900000cFDzOAAW-Bezirk Mittel- und Oberfranken
             // StagingKeycloak-Nextcloud-9f367a130ae143eda1ede9a50e56d896-FK Internet
 
@@ -493,14 +498,16 @@ class ProviderService
                 // Bezirk Mittel- und Oberfranken
                 // FK Internet
 
-                $sanizedGroups[] = [
+                $sanitizedGroups[] = [
                     'gid' => $gid,
                     'displayName' => $displayName,
                 ];
             }
         }
 
-        return $sanizedGroups;
+        // $this->logger->error('YO: ' . json_encode($sanitizedGroups));
+
+        return $sanitizedGroups;
     }
 
     private function login($uid, Profile $profile, $newGroupPrefix = '')
@@ -618,10 +625,14 @@ class ProviderService
                     } else {
                         $socialGroup = $this->groupManager->createGroup($sanitizedGroup['gid']);
                     }
+
+                    // $this->logger->error('Sanitized: ' . json_encode($sanitizedGroup));
+                    // $this->logger->error('socialGroup getDisplayName: ' . $socialGroup->getDisplayName());
                     
                     if ($socialGroup->getDisplayName() !== $sanitizedGroup['displayName']) {
                         $socialGroup->setDisplayName($sanitizedGroup['displayName']);
                     }
+                    
                     if (!$this->groupManager->isInGroup($user->getUID(), $socialGroup)) {
                         $socialGroup->addUser($user);
                     }
@@ -648,7 +659,7 @@ class ProviderService
             }
 
             $defaultGroup = $profile->data['default_group'];
-            if ($defaultGroup && ($group = $this->groupManager->get($defaultGroup)) && !$group->inGroup($user)) {
+            if ($defaultGroup && $group = $this->groupManager->get($defaultGroup)) {
                 $group->addUser($user);
             }
         }
