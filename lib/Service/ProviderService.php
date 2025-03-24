@@ -16,6 +16,7 @@ use OCA\SocialLogin\Provider\CustomOpenIDConnect;
 use OCA\SocialLogin\Db\ConnectedLoginMapper;
 use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Http\RedirectResponse;
+use OCP\Authentication\Token\IToken;
 use OCP\IAvatarManager;
 use OCP\IConfig;
 use OCP\IGroupManager;
@@ -670,6 +671,16 @@ class ProviderService
         $this->userSession->createRememberMeToken($user);
 
         $token = $this->tokenProvider->getToken($this->userSession->getSession()->getId());
+        // needed since NC 30.0.3
+        if (
+            $this->config->getUserValue($user->getUid(), $this->appName, 'disable_password_confirmation')
+            && defined(IToken::class.'::SCOPE_SKIP_PASSWORD_VALIDATION')
+        ) {
+            $scope = $token->getScopeAsArray();
+            $scope[IToken::SCOPE_SKIP_PASSWORD_VALIDATION] = true;
+            $token->setScope($scope);
+            $this->tokenProvider->updateToken($token);
+        }
         $this->userSession->completeLogin($user, [
             'loginName' => $user->getUID(),
             'password' => $userPassword,

@@ -2,9 +2,13 @@
 
 namespace OCA\SocialLogin\Controller;
 
+use OC\Authentication\Token\IProvider;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\PasswordConfirmationRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Http\RedirectResponse;
+use OCP\Authentication\Token\IToken;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IConfig;
@@ -23,6 +27,8 @@ class SettingsController extends Controller
     private $userSession;
     /** @var IL10N */
     private $l;
+    /** @var IProvider */
+    private $tokenProvider;
     /** @var ConnectedLoginMapper */
     private $socialConnect;
 
@@ -33,6 +39,7 @@ class SettingsController extends Controller
         IURLGenerator $urlGenerator,
         IUserSession $userSession,
         IL10N $l,
+        IProvider $tokenProvider,
         ConnectedLoginMapper $socialConnect
     ) {
         parent::__construct($appName, $request);
@@ -40,6 +47,7 @@ class SettingsController extends Controller
         $this->urlGenerator = $urlGenerator;
         $this->userSession = $userSession;
         $this->l = $l;
+        $this->tokenProvider = $tokenProvider;
         $this->socialConnect = $socialConnect;
     }
 
@@ -90,16 +98,26 @@ class SettingsController extends Controller
      * @NoAdminRequired
      * @PasswordConfirmationRequired
      */
+    #[NoAdminRequired]
+    #[PasswordConfirmationRequired]
     public function savePersonal($disable_password_confirmation)
     {
         $uid = $this->userSession->getUser()->getUID();
         $this->config->setUserValue($uid, $this->appName, 'disable_password_confirmation', $disable_password_confirmation ? 1 : 0);
+        if (defined(IToken::class.'::SCOPE_SKIP_PASSWORD_VALIDATION')) {
+            $token = $this->tokenProvider->getToken($this->userSession->getSession()->getId());
+            $scope = $token->getScopeAsArray();
+            $scope[IToken::SCOPE_SKIP_PASSWORD_VALIDATION] = (bool)$disable_password_confirmation;
+            $token->setScope($scope);
+            $this->tokenProvider->updateToken($token);
+        }
         return new JSONResponse(['success' => true]);
     }
 
     /**
      * @NoAdminRequired
      */
+    #[NoAdminRequired]
     public function disconnectSocialLogin($login)
     {
         $this->socialConnect->disconnectLogin($login);
