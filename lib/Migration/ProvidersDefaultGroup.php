@@ -10,7 +10,7 @@ class ProvidersDefaultGroup implements IRepairStep
     /** @var IConfig */
     private $config;
 
-    private $appName = 'sociallogin';
+    private $appName = 'dotplex_sociallogin';
 
     public function __construct(IConfig $config)
     {

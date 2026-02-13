@@ -21,7 +21,7 @@ use OCP\Util;
 
 class Application extends App implements IBootstrap
 {
-    private $appName = 'sociallogin';
+    private $appName = 'dotplex_sociallogin';
     private $regContext;
 
     public function __construct()

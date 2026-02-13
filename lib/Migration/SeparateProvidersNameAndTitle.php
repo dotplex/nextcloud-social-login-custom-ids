@@ -14,7 +14,7 @@ class SeparateProvidersNameAndTitle implements IRepairStep
     /** @var IDBConnection */
     private $db;
 
-    private $appName = 'sociallogin';
+    private $appName = 'dotplex_sociallogin';
 
     public function __construct(IConfig $config, IDBConnection $db)
     {
