@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-    <id>sociallogin</id>
-    <name>Social Login (Custom IDs)</name>
+    <id>dotplex_sociallogin</id>
+    <name>dotplex - Social Login (Custom IDs)</name>
     <summary>Social login via OAuth or OpenID</summary>
     <description> </description>
     <version>15.9.2</version>
@@ -16,7 +16,7 @@
     <repository>https://github.com/dotplex/nextcloud-social-login-custom-ids</repository>
     <screenshot>https://github.com/dotplex/nextcloud-social-login-custom-ids/master/appinfo/screenshot.png</screenshot>
     <dependencies>
-        <nextcloud min-version="23" max-version="99" />
+        <nextcloud min-version="31" max-version="99" />
     </dependencies>
     <settings>
         <admin>OCA\SocialLogin\Settings\AdminSettings</admin>
