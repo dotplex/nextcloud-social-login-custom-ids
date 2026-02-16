@@ -569,7 +569,7 @@ class ProviderService
 
                 $sanitizedSyncGroups = $this->sanitizeSyncGroups($syncGroups, $newGroupPrefix);
 
-                if (!$this->appConfig->getAppValue($this->appName, 'no_prune_user_groups')) {
+                if (!$this->appConfig->getValueBool($this->appName, 'no_prune_user_groups')) {
                     foreach ($userGroups as $group) {
                         if (!in_array($group->getGID(), array_column($sanitizedSyncGroups, 'gid'))) {
                             $group->removeUser($user);
