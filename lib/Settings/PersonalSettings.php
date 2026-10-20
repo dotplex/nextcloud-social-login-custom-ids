@@ -79,7 +79,7 @@ class PersonalSettings implements ISettings
 
     public function getSection()
     {
-        return 'sociallogin';
+        return $this->appName;
     }
 
     public function getPriority()

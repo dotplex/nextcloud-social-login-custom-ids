@@ -112,6 +112,6 @@ class SettingsController extends Controller
     public function disconnectSocialLogin($login)
     {
         $this->socialConnect->disconnectLogin($login);
-        return new RedirectResponse($this->urlGenerator->linkToRoute('settings.PersonalSettings.index', ['section'=>'sociallogin']));
+        return new RedirectResponse($this->urlGenerator->linkToRoute('settings.PersonalSettings.index', ['section'=>$this->appName]));
     }
 }

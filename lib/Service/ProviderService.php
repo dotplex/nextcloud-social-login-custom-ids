@@ -482,7 +482,7 @@ class ProviderService
             }
             $currentUid = $this->userSession->getUser()->getUID();
             $this->socialConnect->connectLogin($currentUid, $uid);
-            return new RedirectResponse($this->urlGenerator->linkToRoute('settings.PersonalSettings.index', ['section'=>'sociallogin']));
+            return new RedirectResponse($this->urlGenerator->linkToRoute('settings.PersonalSettings.index', ['section'=>$this->appName]));
         }
 
         if ($this->appConfig->getValueBool($this->appName, 'restrict_users_wo_assigned_groups') && empty($profile->data['groups'])) {
