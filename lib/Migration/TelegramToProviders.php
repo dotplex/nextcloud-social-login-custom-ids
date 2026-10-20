@@ -7,7 +7,7 @@ use OCP\IAppConfig;
 
 class TelegramToProviders implements IRepairStep
 {
-    private $appName = 'sociallogin';
+    private $appName = 'dotplex_sociallogin';
 
     public function __construct(
         private IAppConfig $appConfig

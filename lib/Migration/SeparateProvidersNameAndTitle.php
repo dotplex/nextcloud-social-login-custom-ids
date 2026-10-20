@@ -8,7 +8,7 @@ use OCP\IAppConfig;
 
 class SeparateProvidersNameAndTitle implements IRepairStep
 {
-    private $appName = 'sociallogin';
+    private $appName = 'dotplex_sociallogin';
 
     public function __construct(
         private IAppConfig $appConfig,

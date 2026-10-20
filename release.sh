@@ -1,7 +1,7 @@
 #!/bin/bash
 
 GITHUB_REPO=zorn-v/nextcloud-social-login
-APP_NAME=sociallogin
+APP_NAME=dotplex_sociallogin
 NC_KEY_FILE=~/.nextcloud/certificates/$APP_NAME.key
 NC_CERT_FILE=~/.nextcloud/certificates/$APP_NAME.crt
 

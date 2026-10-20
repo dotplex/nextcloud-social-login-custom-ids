@@ -7,7 +7,7 @@ use OCP\IAppConfig;
 
 class CreateDisabledUserPerProvider implements IRepairStep
 {
-    private $appName = 'sociallogin';
+    private $appName = 'dotplex_sociallogin';
 
     public function __construct(
         private IAppConfig $appConfig
@@ -20,7 +20,7 @@ class CreateDisabledUserPerProvider implements IRepairStep
 
     public function run(IOutput $output)
     {
-        if (version_compare($this->appConfig->getValueString($this->appName, 'installed_version'), '6.6.0') >= 0) {
+        if (version_compare($this->appConfig->getValueString($this->appName, 'installed_version'), '16.6.0') >= 0) { // dotplex versions are upstream +10
             return;
         }
         if ($this->appConfig->getValueBool($this->appName, 'create_disabled_users')) {
