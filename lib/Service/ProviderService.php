@@ -673,7 +673,7 @@ class ProviderService
         $token = $this->tokenProvider->getToken($this->userSession->getSession()->getId());
         // needed since NC 30.0.3
         if (
-            $this->config->getUserValue($user->getUid(), $this->appName, 'disable_password_confirmation')
+            $this->config->getUserValue($user->getUid(), $this->appName, 'disable_password_confirmation', '1')
             && defined(IToken::class.'::SCOPE_SKIP_PASSWORD_VALIDATION')
         ) {
             $scope = $token->getScopeAsArray();
