@@ -21,8 +21,6 @@
     <settings>
         <admin>OCA\SocialLogin\Settings\AdminSettings</admin>
         <admin-section>OCA\SocialLogin\Settings\AdminSection</admin-section>
-        <personal>OCA\SocialLogin\Settings\PersonalSettings</personal>
-        <personal-section>OCA\SocialLogin\Settings\AdminSection</personal-section>
     </settings>
     <repair-steps>
         <post-migration>
